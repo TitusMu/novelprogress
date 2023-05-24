@@ -1,5 +1,10 @@
 (global-set-key (kbd "s-#") #'my/ShowProgress_or_Characters)
 
+(defvar Ziel)
+(defvar Tagesziel)
+(setq OverallGoal 550000)
+(setq DailyGoal 6000)         ;; 6000 characters für two pages per day, if it is urgent, I can set it to 3 pages
+
 (defvar NumberOfChars_INT)
 (defvar NumberOfChars_STR)
 (defvar Pages_STR)
@@ -31,7 +36,7 @@
    (setq NumberOfChars_INT (string-width (buffer-string)))
    (setq Pages_STR (number-to-string (/ NumberOfChars_INT 3000)))
    (setq NumberOfChars_STR (group-number NumberOfChars_INT))
-   (setq Percent_INT (/ NumberOfChars_INT (/ Ziel 100)))
+   (setq Percent_INT (/ NumberOfChars_INT (/ OverallGoal 100)))
    (setq Percent_STR (number-to-string Percent_INT))
    (setq Percent_CurrentPage_INT (/ (- NumberOfChars_INT (* (/ NumberOfChars_INT 3000) 3000)) 30))
    (setq Percent_CurrentPage_STR (number-to-string Percent_CurrentPage_INT))
@@ -51,7 +56,7 @@
      (save-excursion
        (outline-up-heading 1)
        (setq StartingPoint (point))
-       ;; condition-case, because outline-forward-same-level will through an error if no more header is following
+       ;; condition-case, because outline-forward-same-level will throw an error if no more header is following
        (condition-case nil (progn (outline-forward-same-level 1) (setq Endpoint (point))) (error (setq Endpoint (point-max))))
        ;; if Endpoint doesn’t contain a number because forward-same-level isn’t possible, count until end of buffer
        ) ;; if no number because it is the last chapter
@@ -60,14 +65,13 @@
 
      ;; When loaded the first time on this day, count the number of characters and save them in Status_before.txt
      ;; also append to file Novel_Status.txt, with date of the novel’s file
-     ;; Dann immer vergleichen mit aktuellem Romanstand
-     ;; Die Funktion my/read-file ist im Abschnitt [[Rechnungsnummer erhöhen]] definiert
+     ;; Afterwards always compare with current state of novel progress
      (setq Status_before_STR (my/read-file "/home/titus/Writer/Org/Status_before.txt"))
      (setq Status_before_INT (string-to-number Status_before_STR))
      (setq New_Today_INT (- NumberOfChars_INT Status_before_INT))
      (setq New_Today_STR (number-to-string New_Today_INT))
      (setq New_Today_Percent (/ New_Today_INT (/ DailyGoal 100)))
-     (if (> New_Today_Percent 100) (setq New_Today_Percent 100))      ;; if more than 100 % of dayly goal
+     (if (> New_Today_Percent 100) (setq New_Today_Percent 100))      ;; if more than 100 % of daily goal
      (if (< New_Today_INT 0) (setq New_Today_Percent 0))              ;; if less text then on the day before because of deleting/editing parts of it
      (setq New_Today_Number_of_Blocks (round (/ New_Today_Percent 10)))
      (setq Bar_Done_Today (make-string New_Today_Number_of_Blocks ?≡))
@@ -137,7 +141,7 @@
       (setq Pages_STR (number-to-string (/ NumberOfChars_INT 3000)))
       (setq NumberOfChars_STR (group-number NumberOfChars_INT))
       (setq NumberOfCharacters_STR_without_Point (number-to-string NumberOfChars_INT))
-      (setq Percent_INT (/ NumberOfChars_INT (/ Ziel 100)))
+      (setq Percent_INT (/ NumberOfChars_INT (/ OverallGoal 100)))
       (setq Percent_STR (number-to-string Percent_INT))
       (setq Save_Status (concat "Status of work on " (format-time-string "%a, %d.%m.%Y" (visited-file-modtime)) ": " NumberOfChars_STR " characters, " Pages_STR " pages, equals " Percent_STR " Percent.\n"))
       (append-to-file Save_Status nil "/home/titus/Writer/Org/Novel_Status.txt")
