@@ -1,7 +1,7 @@
 (global-set-key (kbd "s-#") #'my/ShowProgress_or_Characters)
 
-(defvar Ziel)
-(defvar Tagesziel)
+(defvar OverallGoal)
+(defvar DailyGoal)
 (setq OverallGoal 550000)
 (setq DailyGoal 6000)         ;; 6000 characters für two pages per day, if it is urgent, I can set it to 3 pages
 
